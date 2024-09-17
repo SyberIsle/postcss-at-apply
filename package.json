@@ -1,24 +1,35 @@
 {
-  "name": "postcss-at-apply",
-  "version": "0.0.0",
-  "description": "PostCSS plugin asdf",
-  "keywords": ["postcss", "css", "postcss-plugin", "postcss-at-apply"],
+  "name": "@syberisle/postcss-at-apply",
+  "version": "0.0.2",
+  "description": "Tailwind like @apply processing",
+  "keywords": [
+    "postcss",
+    "css",
+    "postcss-plugin",
+    "postcss-at-apply"
+  ],
   "scripts": {
-    "unit": "node --test index.test.js",
-    "test": "npm run unit && eslint ."
+    "lint": "eslint index.js tests/index.js",
+    "test": "rm -rf test/debugout.txt && yarn run lint && tape tests"
   },
   "author": "David Lundgren <dlundgren@syberisle.net>",
   "license": "MIT",
-  "repository": "syberisle/postcss-at-apply",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/syberisle/postcss-at-apply.git"
+  },
   "engines": {
     "node": ">=18.0.0"
   },
   "peerDependencies": {
+    "picocolors": "^1.1.0",
     "postcss": "^8.4.27"
   },
   "devDependencies": {
     "eslint": "^8.47.0",
-    "postcss": "^8.4.27"
+    "picocolors": "^1.1.0",
+    "postcss": "^8.4.27",
+    "tape": "^5.7.1"
   },
   "eslintConfig": {
     "parserOptions": {
@@ -28,6 +39,13 @@
       "node": true,
       "es6": true
     },
-    "extends": ["eslint:recommended"]
-  }
+    "extends": [
+      "eslint:recommended"
+    ]
+  },
+  "bugs": {
+    "url": "https://github.com/syberisle/postcss-at-apply/issues"
+  },
+  "homepage": "https://github.com/syberisle/postcss-at-apply#readme",
+  "main": "index.js"
 }

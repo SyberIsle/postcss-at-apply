@@ -7,3 +7,6 @@ yarn.lock
 .github
 .editorconfig
 coverage/
+.idea
+tests/
+*.tgz

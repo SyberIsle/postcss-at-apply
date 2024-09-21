@@ -31,6 +31,9 @@
     "postcss": "^8.4.27",
     "tape": "^5.7.1"
   },
+  "clean-publish": {
+    "access": "public"
+  },
   "eslintConfig": {
     "parserOptions": {
       "ecmaVersion": 2017

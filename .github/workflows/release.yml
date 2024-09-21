@@ -17,6 +17,6 @@ jobs:
           scope: '@syberisle'
       - run: corepack yarn
       - run: node .github/scripts/add-version.js
-      - run: corepack yarn run clean-publish --access=public
+      - run: corepack yarn run clean-publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

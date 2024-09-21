@@ -1,0 +1,22 @@
+name: Publish package to GitHub Packages
+on:
+  release:
+    types: [published]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org'
+          scope: '@syberisle'
+      - run: corepack yarn
+      - run: node .github/scripts/add-version.js
+      - run: corepack yarn run clean-publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

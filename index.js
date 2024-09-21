@@ -7,28 +7,29 @@ module.exports = () => {
 	let cache = {}
 	return {
 		postcssPlugin: 'postcss-at-apply',
-		AtRule: {
+		AtRule       : {
 			apply: (rule, {result}) => {
-				const classes = rule.params
-					.replace(' !important', '')
-					.split(/[\s\t\n]+/g);
-				const root = rule.root();
-				const rules = new Set();
+				const classes = rule.params.replace(' !important', '').split(/[\s\t\n]+/g);
+				const root    = rule.root();
+				const rules   = new Set();
 				for (let name of classes) {
-					let orig = name
-					name = name.startsWith('.') ? name : `.${name}`;
 					if (!(name in cache)) {
-						root.walkRules(name, rule => cache[name] = rule);
+						root.walkRules(
+							name.startsWith('.') ? name : `.${name}`,
+							rule => cache[name] = rule
+						);
 					}
 
 					if (name in cache) {
 						for (const node of cache[name].nodes) {
 							rules.add(node.toString());
 						}
-					} else {
-						result.warn(warningHighlight(rule, orig));
+					}
+					else {
+						result.warn(warningHighlight(rule, name));
 					}
 				}
+
 				if (rules.size > 0) {
 					rule.replaceWith(...rules);
 				}
@@ -43,9 +44,10 @@ module.exports = () => {
  *
  * @returns {string} The formatted warning
  */
-function warningHighlight(rule, search) {
+function warningHighlight(rule, search)
+{
 	// there is a possibility it's at the end of the
-	let re = new RegExp("\\b" + search + "\\b");
+	let re    = new RegExp("\\b" + search + "\\b");
 	const idx = rule.params.match(re);
 	if (!idx) {
 		return '';

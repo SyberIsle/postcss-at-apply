@@ -1,8 +1,9 @@
 const postcss = require('postcss'),
-	test = require('tape'),
-	apply = require('../index')
+      test    = require('tape'),
+      apply   = require('../index')
 
-function pluginTest(t, payload, expected) {
+function pluginTest(t, payload, expected)
+{
 	t.equal(postcss(apply).process(payload).css.trim(), expected);
 }
 
@@ -26,7 +27,7 @@ test('multi selector', (t) => {
 });
 
 test('warning on missing', t => {
-	const ps = postcss(apply({debug:true})).process('.a{@apply z kakaw b} .b{color:blue}');
+	const ps = postcss(apply({debug: true})).process('.a{@apply z kakaw b} .b{color:blue}');
 	for (const w of ps.warnings()) {
 		// we can't rely on indexOf due to CLI colorization
 		t.notEqual(-1, w.text.indexOf("Rule not found in css"), 'has "Rule not found in css"');

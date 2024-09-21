@@ -54,6 +54,5 @@
     "url": "https://github.com/syberisle/postcss-at-apply/issues"
   },
   "homepage": "https://github.com/syberisle/postcss-at-apply#readme",
-  "main": "index.js",
-  "version": "0.0.4"
+  "main": "index.js"
 }

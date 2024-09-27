@@ -46,23 +46,21 @@ module.exports = () => {
  */
 function warningHighlight(rule, search)
 {
-	// there is a possibility it's at the end of the
-	let re    = new RegExp("\\b" + search + "\\b");
-	const idx = rule.params.match(re);
-	if (!idx) {
+	const re = new RegExp("\\b" + search + "\\b");
+	const match = rule.params.match(re);
+	if (!match) {
 		return '';
 	}
-	let size = ' '.repeat(rule.source.start.line.toString().length);
 
 	return [
+		pico.reset() + '',
+		pico.yellow("WARNING: ") + 'Rule not found in css',
 		'',
-		pico.yellow("WARNING: ") + `Rule not found in css`,
-		'',
-		pico.blue(` ${size} | `) + (rule.source.input.file || rule.source.input.css),
-		pico.blue(` ${rule.source.start.line} | `)
-		+ `@apply ${rule.params.replace(re, pico.red(search))}`,
-		pico.blue(` ${size} | `)
-		+ '       ' + ' '.repeat(idx.index) + pico.red('^'.repeat(search.length) + ' not found')
+		pico.blue(' | ') + (rule.source.input.file || rule.source.input.css),
+		pico.blue(` | ${rule.parent.selector} {`),
+		pico.blue(' |   @apply ') + rule.params.replace(re, pico.red(search)),
+		pico.blue(' |          ') + ' '.repeat(match.index) + pico.red('^'.repeat(search.length) + ' not found'),
+		pico.blue(` | }`),
 	].join('\n');
 }
 

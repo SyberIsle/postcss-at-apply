@@ -13,15 +13,17 @@ module.exports = () => {
 				const root    = rule.root();
 				const rules   = new Set();
 				for (let name of classes) {
-					if (!(name in cache)) {
-						root.walkRules(
-							name.startsWith('.') ? name : `.${name}`,
-							rule => cache[name] = rule
-						);
+					const selector = name.startsWith('.') ? name : `.${name}`
+					if (!(selector in cache)) {
+						root.walk(child => {
+							if (child.type === 'rule' && child.selectors.includes(selector)) {
+								cache[selector] = child
+							}
+						});
 					}
 
-					if (name in cache) {
-						for (const node of cache[name].nodes) {
+					if (selector in cache) {
+						for (const node of cache[selector].nodes) {
 							rules.add(node.toString());
 						}
 					}

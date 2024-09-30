@@ -36,3 +36,21 @@ test('warning on missing', t => {
 	t.equal(ps.css.trim(), '.a{color:blue} .b{color:blue}');
 	t.end();
 });
+
+test('group of selectors', t => {
+	const ps = postcss(apply({debug: true})).process('.a, .c {color:red} .b{@apply a}');
+	t.equal(ps.css.trim(), '.a, .c {color:red} .b{color:red}');
+	t.end();
+});
+
+test('group of selector with non-class prefix ', t => {
+	const ps = postcss(apply({debug: true})).process('div.a {color:blue} .a, .c {color:red} .b{@apply a}');
+	t.equal(ps.css.trim(), 'div.a {color:blue} .a, .c {color:red} .b{color:red}');
+	t.end();
+});
+
+test('rule selector with > ', t => {
+	const ps = postcss(apply({debug: true})).process('.a, .c {color:red} div > .a {color:blue} .b{@apply a}');
+	t.equal(ps.css.trim(), '.a, .c {color:red} div > .a {color:blue} .b{color:red}');
+	t.end();
+});

@@ -1,6 +1,7 @@
 const postcss = require('postcss'),
       test    = require('tape'),
-      apply   = require('../index')
+      apply   = require('../index'),
+      pico = require('picocolors')
 
 function pluginTest(t, payload, expected)
 {
@@ -55,7 +56,6 @@ test('rule selector with > ', t => {
 	t.end();
 });
 
-
 test('skips reference to self', t => {
 	const ps = postcss(apply({debug: true})).process('.a, .c {color:red} .b{@apply a b}');
 	for (const w of ps.warnings()) {
@@ -75,5 +75,48 @@ test('skips reference to self', t => {
 	}
 	t.equal(2, i, "found 2 warnings");
 	t.equal(ps.css.trim(), '.z {color:red} .a, .c {color:red}', 'missing .b');
+	t.end();
+});
+
+test('important is added ', t => {
+	const ps = postcss(apply({debug: true})).process('.a, .c {color:red} div > .a {color:blue} .b{@apply !a}');
+	t.equal(ps.css.trim(), '.a, .c {color:red} div > .a {color:blue} .b{color:red !important}', 'contains .a');
+	t.end();
+});
+
+test('global !important', t => {
+	const ps = postcss(apply({debug: true})).process('.a, .c {color:red} .z {background:blue} .b{@apply a z !important}');
+	t.equal(ps.css.trim(), '.a, .c {color:red} .z {background:blue} .b{color:red !important;background:blue !important}', 'contains .a .z with !important');
+	t.end();
+});
+
+test('selector adds !important', t => {
+	const ps = postcss(apply({debug: true})).process('.a, .c {color:red} .b{@apply !a}');
+	t.equal(ps.css.trim(), '.a, .c {color:red} .b{color:red !important}', 'contains .a with !important');
+	t.end();
+});
+
+test('selector adds !important to multiple rules', t => {
+	const ps = postcss(apply({debug: true})).process('.a, .c {color:red; background: black} .b{@apply !a}');
+	t.equal(
+		ps.css.trim(),
+		'.a, .c {color:red; background: black} .b{color:red !important; background: black !important}',
+		'contains .a rules with !important'
+	);
+	t.end();
+});
+
+test('selector removes !important', t => {
+	const ps = postcss(apply({debug: true})).process('.a, .c {color:red !important} .b{@apply a}');
+	t.equal(ps.css.trim(), '.a, .c {color:red !important} .b{color:red}', 'contains .a without !important');
+	t.end();
+});
+
+test('important warning on non-existing', t => {
+	const ps = postcss(apply({debug: true})).process('.a, .c {color:red} .b{@apply a !d}');
+	for (const w of ps.warnings()) {
+		t.ok(w.text.includes(pico.red('!d')), '"!d" was found in warning message');
+	}
+
 	t.end();
 });

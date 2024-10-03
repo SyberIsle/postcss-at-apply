@@ -18,6 +18,7 @@ module.exports = () => {
 				atRule.parent.selectors.forEach(selector => { !map.has(selector) && map.set(selector, new Set); });
 				atRule.params.replace(' !important', '').split(/[\s\t\n]+/g).forEach(name => {
 					atRule.parent.selectors.forEach(key => {
+						name.startsWith('!') && (name = name.substring(1));
 						map.get(key).add(name.startsWith('.') ? name : `.${name}`)
 					});
 				})
@@ -34,22 +35,38 @@ module.exports = () => {
 			// we didn't cache the atRule... maybe we should have?
 			root.walkAtRules('apply', (atRule) => {
 				const rules = new Set;
+				const $important = atRule.params.includes('!important');
 				for (let name of atRule.params.replace(' !important', '').split(/[\s\t\n]+/g)) {
-					let selector = name.startsWith('.') ? name : `.${name}`;
+					const important = name.startsWith('!');
+					name = name.substring(important ? 1 : 0);
+
+					const selector = name.startsWith('.') ? name : `.${name}`;
 					if (selector in cache) {
-						for (let node of cache[selector].nodes) {
-							rules.add(node.clone());
+						for (const node of cache[selector].nodes) {
+							const tmp = node.clone();
+							tmp.important = $important || important;
+							rules.add(tmp);
 						}
 					}
 					else if (recursion.has(`${atRule.parent.selector}-${selector}`)) {
-						result.warn(warningHighlight(atRule, name, 'Circular reference detected', 'circular reference'));
+						result.warn(warningHighlight(
+							atRule,
+							important ? `!${name}` : name,
+							'Circular reference detected',
+							'circular reference'
+						));
 					}
 					else {
-						result.warn(warningHighlight(atRule, name, 'Rule not found in css', 'not found'));
+						result.warn(warningHighlight(
+							atRule,
+							important ? `!${name}` : name,
+							'Rule not found in css',
+							'not found'
+						));
 					}
 				}
 
-				let parent = atRule.parent;
+				const parent = atRule.parent;
 				atRule.replaceWith(...rules);
 				if (!parent.nodes || parent.nodes.length === 0) {
 					// should a warning be emitted that we removed the parent?
@@ -88,7 +105,9 @@ module.exports = () => {
  */
 function warningHighlight(rule, search, description, message)
 {
-	const re    = new RegExp("\\b" + search + "\\b");
+	const re = new RegExp(
+		(search.startsWith('!') ? '' : "\\b") + search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + "\\b"
+	);
 	const match = rule.params.match(re);
 	if (!match) {
 		return '';

@@ -46,7 +46,8 @@
       "consistent-return": "error",
       "curly": "error",
       "eqeqeq": "error",
-      "guard-for-in": "error"
+      "guard-for-in": "error",
+      "no-mixed-spaces-and-tabs": ["error", "smart-tabs"]
     },
     "extends": [
       "eslint:recommended"
